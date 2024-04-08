@@ -1,10 +1,10 @@
 require('colors');
 
-const { inquiereMenu, pausa,leerInput    
- } = require('./helpers/inquirer');
- const { 
-    guardarDB , leerDB
- } = require('./helpers/guardarArchivo');
+const { inquiereMenu, pausa, leerInput, listadoTareasBorrar, confirmar, mostrarListadoChecklist
+} = require('./helpers/inquirer');
+const {
+    guardarDB, leerDB
+} = require('./helpers/guardarArchivo');
 const Tareas = require('./models/tareas');
 
 const main = async () => {
@@ -13,11 +13,11 @@ const main = async () => {
     const tareas = new Tareas();
     const tareasDB = leerDB();
 
-    if( tareasDB){
-        tareas.cargarTareasFromArray(tareasDB);        
+    if (tareasDB) {
+        tareas.cargarTareasFromArray(tareasDB);
     }
     //await pausa();
-    
+
     do {
         opt = await inquiereMenu();
         //console.log({ opt });
@@ -36,14 +36,31 @@ const main = async () => {
             case '4':
                 tareas.listasPendientesCompletadas(false);
                 break;
-            case '5':
+            case '5': //completar
+                const ids = await mostrarListadoChecklist(tareas.listadoArr);
+                //console.log(ids);
+                tareas.toggleCompletadas(ids);
+                break;
+            case '6':
+                const id = await listadoTareasBorrar(tareas.listadoArr);
+                if (id !== '0') {
+                    const ok = await confirmar('Esta seguro?')
+                    // todo: preguntar si esta seguro
+                    // console.log(ok);
+                    if (ok) {
+                        tareas.borrarTarea(id);
+                        console.log('tarea borrada');
+                    }
+                }
+
                 break;
         }
-        
+
         //solo para pruebas
-        //guardarDB(tareas.listadoArr);
+        guardarDB(tareas.listadoArr);
 
         await pausa();
+
     } while (opt !== '0')
 
 
