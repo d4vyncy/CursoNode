@@ -7,8 +7,12 @@ class Busquedas {
     dbPath='./db/database.json'
 
     constructor() {
-        //todo: leer DB si existe
+        this.leerDB();
+    }
 
+    get historialCapitalizado(){
+        // Capitalizar cada palabra
+        return this.historial;
     }
 
     get parmsMapbox() {
@@ -99,6 +103,13 @@ class Busquedas {
 
     }
     leerDB(){
+        if (fs.existsSync(this.dbPath)){
+            return;
+        }
+
+        const info = fs.readFileSync(this.dbPath,{encoding:'utf-8'});
+        const data = JSON.parse(info)
+        this.historial=data.historial
 
     }
 }
